@@ -15,7 +15,7 @@ yarn start:dev
 Using [gRPCurl][gRPCurl], the endpoint can be tested.
 
 ```sh
-grpcurl -d '{"name":"Gatsby"}' -plaintext -import-path src/protos -proto hello.proto 0.0.0.0:50051 helloworld.Greeter.SayHello
+grpcurl -d '{"name":"Gatsby"}' -plaintext -import-path src/protos -proto hello.proto 0.0.0.0:50051 hello.Greeter.SayHello
 ```
 
 <!-- References -->

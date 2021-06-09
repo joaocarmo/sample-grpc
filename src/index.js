@@ -13,7 +13,8 @@ const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   defaults: true,
   oneofs: true,
 })
-const helloProto = grpc.loadPackageDefinition(packageDefinition).helloworld
+
+const helloProto = grpc.loadPackageDefinition(packageDefinition).hello
 
 /**
  * Implements the SayHello RPC method.
@@ -25,7 +26,7 @@ const sayHello = (call, callback) => {
 
 /**
  * Starts an RPC server that receives requests for the Greeter service at the
- * sample server port
+ * sample server port.
  */
 const main = () => {
   const server = new grpc.Server()

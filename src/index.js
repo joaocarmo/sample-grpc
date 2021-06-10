@@ -4,9 +4,17 @@ const protoLoader = require('@grpc/proto-loader')
 
 const HOST = '0.0.0.0'
 const PORT = '50051'
-const PROTO_PATH = path.join(__dirname, 'protos', 'hello.proto')
+const PROTO_PATH_HELLO = path.join(__dirname, 'protos', 'hello.proto')
+const PROTO_PATH_TODO = path.join(__dirname, 'protos', 'todo.proto')
 
-const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
+const todoDB = [
+  { content: 'Buy more chocolate', finished: false },
+  { content: 'Finish poem', finished: true },
+  { content: 'Eat dessert', finished: false },
+]
+const nullTodo = { content: '', finished: false }
+
+const helloPackageDefinition = protoLoader.loadSync(PROTO_PATH_HELLO, {
   keepCase: true,
   longs: String,
   enums: String,
@@ -14,23 +22,34 @@ const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   oneofs: true,
 })
 
-const helloProto = grpc.loadPackageDefinition(packageDefinition).hello
+const todoPackageDefinition = protoLoader.loadSync(PROTO_PATH_TODO, {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+})
 
-/**
- * Implements the SayHello RPC method.
- */
+const helloProto = grpc.loadPackageDefinition(helloPackageDefinition).hello
+
+const todoProto = grpc.loadPackageDefinition(todoPackageDefinition).todo
+
 const sayHello = (call, callback) => {
-  console.log('Request params:', JSON.stringify(call.request))
+  console.log('Hello Request params:', JSON.stringify(call.request))
   callback(null, { message: `Hello ${call.request.name}` })
 }
 
-/**
- * Starts an RPC server that receives requests for the Greeter service at the
- * sample server port.
- */
+const getTodoById = (call, callback) => {
+  console.log('Todo Request params:', JSON.stringify(call.request))
+  const todoId = +call.request.id
+  const todoObj = todoId < todoDB.length ? todoDB[todoId] : nullTodo
+  callback(null, todoObj)
+}
+
 const main = () => {
   const server = new grpc.Server()
   server.addService(helloProto.Greeter.service, { sayHello })
+  server.addService(todoProto.Todo.service, { getTodoById })
   server.bindAsync(`${HOST}:${PORT}`, grpc.ServerCredentials.createInsecure(),
     (error, port) => {
       if (!error) {

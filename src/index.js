@@ -4,6 +4,7 @@ const protoLoader = require('@grpc/proto-loader')
 
 const HOST = '0.0.0.0'
 const PORT = '50051'
+
 const PROTO_PATH_HELLO = path.join(__dirname, 'protos', 'hello.proto')
 const PROTO_PATH_TODO = path.join(__dirname, 'protos', 'todo.proto')
 
@@ -14,24 +15,18 @@ const todoDB = [
 ]
 const nullTodo = { content: '', finished: false }
 
-const helloPackageDefinition = protoLoader.loadSync(PROTO_PATH_HELLO, {
+const pkgCfg = {
   keepCase: true,
   longs: String,
   enums: String,
   defaults: true,
   oneofs: true,
-})
+}
 
-const todoPackageDefinition = protoLoader.loadSync(PROTO_PATH_TODO, {
-  keepCase: true,
-  longs: String,
-  enums: String,
-  defaults: true,
-  oneofs: true,
-})
+const helloPackageDefinition = protoLoader.loadSync(PROTO_PATH_HELLO, pkgCfg)
+const todoPackageDefinition = protoLoader.loadSync(PROTO_PATH_TODO, pkgCfg)
 
 const helloProto = grpc.loadPackageDefinition(helloPackageDefinition).hello
-
 const todoProto = grpc.loadPackageDefinition(todoPackageDefinition).todo
 
 const sayHello = (call, callback) => {
